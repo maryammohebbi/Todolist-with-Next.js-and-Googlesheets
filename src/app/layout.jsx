@@ -10,7 +10,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         <header className="bg-pink-100 p-5 mb-8">
-          <h1 className="text-center">Todo List App Using Next.js and Googlesheets</h1>
+          <h1 className="text-center font-bold">- Todo List Using Next.js and Googlesheets -</h1>
         </header>
         <div>{children}</div>
       </body>
