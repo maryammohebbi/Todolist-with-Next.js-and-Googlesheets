@@ -1,12 +1,14 @@
 "use client";
 import { useEffect, useState} from "react"
 import useAddTodo from "./hooks/useAddTodo"
+import useDeleteTodo from "./hooks/useDeleteTodo";
 
 export default function Home() {
   const [data, setData] = useState([])
   const [loadingData, setLoadingData] = useState(true)
   
   const {addTodo, setTodo, todo} = useAddTodo(setData)
+  const {deleteTodo} = useDeleteTodo(setData)
 
   // Fetch existing todos from Google Sheets
   useEffect(() => {
@@ -62,7 +64,11 @@ export default function Home() {
                 <div className="flex gap-4 w-full">
                   <p className="w-[80%]">{row[0]}</p>
                   <div className="flex w-[20%] justify-between">
-                    <button className="border-2 border-slate-500 rounded-full w-9 h-9">D</button>
+                    <button 
+                      onClick={()=> deleteTodo(row) } 
+                      className="border-2 border-slate-500 rounded-full w-9 h-9">
+                        Delete
+                      </button>
                     <button className="border-2 border-slate-500 rounded-full w-9 h-9">E</button>
                   </div>
                 </div>
