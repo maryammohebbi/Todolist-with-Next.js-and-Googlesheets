@@ -1,3 +1,4 @@
+import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
 export const metadata = {
@@ -9,6 +10,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
+        <Toaster/>
         <header className="bg-pink-100 p-5 mb-8">
           <h1 className="text-center font-bold">- Todo List Using Next.js and Googlesheets -</h1>
         </header>
