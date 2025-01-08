@@ -39,10 +39,26 @@ export async function DELETE(req) {
       return NextResponse.json({ error: "Todo not found" }, { status: 404 });
     }
 
-    // Delete the row by clearing its content
-    await sheets.spreadsheets.values.clear({
+    // Adjust the rowIndex to account for the header row
+    const sheetRowIndex = rowIndex + 1; // Adding 1 to move past the header
+
+    // Use batchUpdate to delete the row by specifying its row index
+    await sheets.spreadsheets.batchUpdate({
       spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-      range: `Sheet1!A${rowIndex + 1}:Z${rowIndex + 1}`,
+      requestBody: {
+        requests: [
+          {
+            deleteDimension: {
+              range: {
+                sheetId: 0, // Adjust this sheetId if necessary (default is 0 for the first sheet)
+                dimension: "ROWS",
+                startIndex: sheetRowIndex - 1, // Correctly target the row to delete
+                endIndex: sheetRowIndex, // Just the row to be deleted
+              },
+            },
+          },
+        ],
+      },
     });
 
     return NextResponse.json({ message: "Todo deleted successfully" });
@@ -51,4 +67,3 @@ export async function DELETE(req) {
     return NextResponse.json({ error: "Failed to delete todo" }, { status: 500 });
   }
 }
-

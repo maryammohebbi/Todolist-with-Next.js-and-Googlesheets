@@ -11,7 +11,7 @@ export default function useDeleteTodo(setData) {
       });
 
       if (response.status === 200) {
-        setData((prevData) => prevData.filter((t) => t.id !== todoId));
+        setData((prevData) => prevData.filter((t) => t.id !== todoId)); // Remove todo from local state
         toast.success("Todo deleted successfully!");
       } else {
         toast.error("Failed to delete todo.");
@@ -24,4 +24,3 @@ export default function useDeleteTodo(setData) {
 
   return { deleteTodo };
 }
-
