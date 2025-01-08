@@ -3,10 +3,10 @@ import { NextResponse } from "next/server";
 
 export async function DELETE(req) {
   try {
-    const { todo } = await req.json(); // Get the todo to delete from request body
+    const { id } = await req.json(); // Get the todo ID from the request body
 
-    if (!todo) {
-      return NextResponse.json({ error: "Todo text is required" }, { status: 400 });
+    if (!id) {
+      return NextResponse.json({ error: "Todo ID is required" }, { status: 400 });
     }
 
     const auth = new google.auth.GoogleAuth({
@@ -18,37 +18,31 @@ export async function DELETE(req) {
     });
 
     const sheets = google.sheets({ version: "v4", auth: await auth.getClient() });
+    const range = "Sheet1!A:Z";
 
-    // Fetch current data to find the row index of the todo to delete
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-      range: "Sheet1!A:Z",
+      range,
     });
 
     const rows = response.data.values || [];
-    const rowIndex = rows.findIndex((row) => row[0] === todo);
+    const headers = rows[0]; // Assume first row contains headers
+    const idIndex = headers.indexOf("ID"); // Find the index of the 'ID' column
+
+    if (idIndex === -1) {
+      return NextResponse.json({ error: "Invalid sheet format" }, { status: 400 });
+    }
+
+    const rowIndex = rows.findIndex((row) => row[idIndex] === id); // Find the row with matching ID
 
     if (rowIndex === -1) {
       return NextResponse.json({ error: "Todo not found" }, { status: 404 });
     }
 
-    // Delete the row using Google Sheets API
-    await sheets.spreadsheets.batchUpdate({
+    // Delete the row by clearing its content
+    await sheets.spreadsheets.values.clear({
       spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-      requestBody: {
-        requests: [
-          {
-            deleteDimension: {
-              range: {
-                sheetId: 0, // Adjust this if your sheet ID is different
-                dimension: "ROWS",
-                startIndex: rowIndex,
-                endIndex: rowIndex + 1,
-              },
-            },
-          },
-        ],
-      },
+      range: `Sheet1!A${rowIndex + 1}:Z${rowIndex + 1}`,
     });
 
     return NextResponse.json({ message: "Todo deleted successfully" });
@@ -57,3 +51,4 @@ export async function DELETE(req) {
     return NextResponse.json({ error: "Failed to delete todo" }, { status: 500 });
   }
 }
+

@@ -1,5 +1,6 @@
 import { google } from "googleapis";
 import { NextResponse } from "next/server";
+import { v4 as uuidv4 } from "uuid";
 
 export async function POST(req) {
   try {
@@ -8,6 +9,9 @@ export async function POST(req) {
     if (!todo) {
       return NextResponse.json({ error: "Todo text is required" }, { status: 400 });
     }
+
+    const id = uuidv4(); // Generate a unique ID for the todo
+    const timestamp = new Date().toISOString();
 
     const auth = new google.auth.GoogleAuth({
       credentials: {
@@ -25,11 +29,11 @@ export async function POST(req) {
       valueInputOption: "RAW",
       insertDataOption: "INSERT_ROWS",
       requestBody: {
-        values: [[todo, new Date().toISOString()]], // Add todo with timestamp
+        values: [[id, todo, timestamp, false]], // Add todo with ID and timestamp, and Completed boolean property (defalut false)
       },
     });
 
-    return NextResponse.json({ message: "Todo added successfully" });
+    return NextResponse.json({ message: "Todo added successfully", id });
   } catch (error) {
     console.error("Error adding todo:", error);
     return NextResponse.json({ error: "Failed to add todo" }, { status: 500 });

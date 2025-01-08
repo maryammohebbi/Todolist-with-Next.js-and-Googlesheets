@@ -17,11 +17,16 @@ export default function useAddTodo(setData){
     try {
         const response = await axios.post("/api/addTodo", {todo})
 
-      if (response.status === 200) {
-        
-        setTodo("")
-        setData((prevData) => [...prevData, [todo]])
-        toast.success("Todo added successfully!")
+        if (response.status === 200) {
+          const newTodo = { 
+            id: response.data.id, 
+            title: todo, 
+            timestamp: new Date().toISOString(), 
+            completed: false 
+          }
+          setTodo("")
+          setData((prevData) => [...prevData, newTodo])
+          toast.success("Todo added successfully!")
       } else {
         toast.success("Failed to add todo. Try again, please.")
       }

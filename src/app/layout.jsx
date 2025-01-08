@@ -11,8 +11,8 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         <Toaster/>
-        <header className="bg-pink-100 p-5 mb-8">
-          <h1 className="text-center font-bold">- Todo List Using Next.js and Googlesheets -</h1>
+        <header className="bg-indigo-50 p-6 mb-8 border border-slate-400">
+          <h1 className="text-center font-bold text-xl">- Todo List With Next.js and Googlesheets -</h1>
         </header>
         <div>{children}</div>
       </body>

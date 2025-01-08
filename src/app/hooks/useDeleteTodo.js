@@ -2,16 +2,16 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 export default function useDeleteTodo(setData) {
-  const deleteTodo = async (row) => {
+  const deleteTodo = async (todo) => {
     try {
-      const todoToDelete = row[0]; // Assuming the todo text is in the first column
+      const todoId = todo.id; // Use the ID for deletion
 
       const response = await axios.delete("/api/deleteTodo", {
-        data: { todo: todoToDelete }, // `data` is used to send the body in DELETE requests
+        data: { id: todoId }, // Send the ID as the identifier for deletion
       });
 
       if (response.status === 200) {
-        setData((prevData) => prevData.filter((r) => r[0] !== todoToDelete));
+        setData((prevData) => prevData.filter((t) => t.id !== todoId));
         toast.success("Todo deleted successfully!");
       } else {
         toast.error("Failed to delete todo.");
@@ -24,3 +24,4 @@ export default function useDeleteTodo(setData) {
 
   return { deleteTodo };
 }
+

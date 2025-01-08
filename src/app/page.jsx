@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useState} from "react"
 import useAddTodo from "./hooks/useAddTodo"
-import useDeleteTodo from "./hooks/useDeleteTodo";
+import useDeleteTodo from "./hooks/useDeleteTodo"
+import useToggleTodo from "./hooks/useToggleTodo";
 
 export default function Home() {
   const [data, setData] = useState([])
@@ -9,19 +10,26 @@ export default function Home() {
   
   const {addTodo, setTodo, todo} = useAddTodo(setData)
   const {deleteTodo} = useDeleteTodo(setData)
-
+  const {toggleTodo} = useToggleTodo(setData)
   // Fetch existing todos from Google Sheets
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("/api/getTodos")
+        const response = await fetch("/api/getTodos");
         if (!response.ok) {
           console.error("Failed to fetch data:", response.statusText);
           return;
         }
   
-        const result = await response.json()
-        setData(result.data || []);
+        const result = await response.json();
+  
+        // Normalize the completed field to a boolean
+        const normalizedData = result.data.map(todo => ({
+          ...todo,
+          completed: todo.completed === "TRUE" ? true : false, // Ensure it's a boolean
+        }));
+  
+        setData(normalizedData); // Update the state with normalized data
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -30,8 +38,8 @@ export default function Home() {
     };
   
     fetchData();
-    
   }, []);
+  
   
  
   return (
@@ -59,22 +67,31 @@ export default function Home() {
           <p>Loading...</p>
         ) : (
           <ul className="mt-2 w-full">
-            {data.map((row, index) => (
-              <li key={index} className="border-2 border-slate-500 rounded-2xl p-5 w-full shadow-xl mb-5">
+            {data.map((todo, index) => (
+              <li
+                key={index}
+                className="border-2 border-slate-500 rounded-2xl p-5 w-full shadow-xl mb-5"
+              >
                 <div className="flex gap-4 w-full">
-                  <p className="w-[80%]">{row[0]}</p>
+                  <p className={`${todo.completed === true ? "line-through" : ""} w-[80%]`}>{todo.title}</p>
                   <div className="flex w-[20%] justify-between">
+                    <button
+                      onClick={() => deleteTodo(todo)}
+                      className="border-2 border-red-500 rounded-full w-9 h-9"
+                    >
+                      D
+                    </button>
                     <button 
-                      onClick={()=> deleteTodo(row) } 
+                      onClick={()=>toggleTodo(todo)}
                       className="border-2 border-slate-500 rounded-full w-9 h-9">
-                        Delete
-                      </button>
-                    <button className="border-2 border-slate-500 rounded-full w-9 h-9">E</button>
+                      E
+                    </button>
                   </div>
                 </div>
               </li>
             ))}
           </ul>
+
         )}
       </div>
     </div>
