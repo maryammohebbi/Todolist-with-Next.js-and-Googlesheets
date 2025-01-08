@@ -1,46 +1,18 @@
 "use client";
 import { useEffect, useState} from "react"
+import { MdOutlineDeleteForever } from "react-icons/md"
+import { TfiCheckBox } from "react-icons/tfi"
 import useAddTodo from "./hooks/useAddTodo"
 import useDeleteTodo from "./hooks/useDeleteTodo"
-import useToggleTodo from "./hooks/useToggleTodo";
+import useToggleTodo from "./hooks/useToggleTodo"
+import useGetTodos from "./hooks/useGetTodos";
 
 export default function Home() {
-  const [data, setData] = useState([])
-  const [loadingData, setLoadingData] = useState(true)
-  
+
+  const {data, setData, loadingData} = useGetTodos()
   const {addTodo, setTodo, todo} = useAddTodo(setData)
   const {deleteTodo} = useDeleteTodo(setData)
   const {toggleTodo} = useToggleTodo(setData)
-  // Fetch existing todos from Google Sheets
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch("/api/getTodos");
-        if (!response.ok) {
-          console.error("Failed to fetch data:", response.statusText);
-          return;
-        }
-  
-        const result = await response.json();
-  
-        // Normalize the completed field to a boolean
-        const normalizedData = result.data.map(todo => ({
-          ...todo,
-          completed: todo.completed === "TRUE" ? true : false, // Ensure it's a boolean
-        }));
-  
-        setData(normalizedData); // Update the state with normalized data
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoadingData(false);
-      }
-    };
-  
-    fetchData();
-  }, []);
-  
-  
  
   return (
     <div className="flex flex-col items-center p-5">
@@ -77,14 +49,14 @@ export default function Home() {
                   <div className="flex w-[20%] justify-between">
                     <button
                       onClick={() => deleteTodo(todo)}
-                      className="border-2 border-red-500 rounded-full w-9 h-9"
+                      className="border-2 border-red-500 rounded-full w-9 h-9 flex items-center justify-center"
                     >
-                      D
+                      <MdOutlineDeleteForever className="w-5 h-5 text-red-400"/>
                     </button>
                     <button 
                       onClick={()=>toggleTodo(todo)}
-                      className="border-2 border-slate-500 rounded-full w-9 h-9">
-                      E
+                      className="border-2 border-slate-500 rounded-full w-9 h-9 flex items-center justify-center">
+                      <TfiCheckBox className="w-4 h-4 text-slate-600"/>
                     </button>
                   </div>
                 </div>
